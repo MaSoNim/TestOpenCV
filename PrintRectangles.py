@@ -1,26 +1,22 @@
 import cv2
 import math
+from PIL import Image
 
-def rectangles(quality, width, height, distance, start_pointX, start_pointY):
-    path = r'BlackRectangle.png'
-    image = cv2.imread(path)
-    window_name = 'Image'
-    for i in range(quality):
-        start_point = (start_pointX + i * (distance + width), start_pointY)
-        end_point = ((start_pointX + i * (distance + width)) + width, start_pointY + height)
-        color = (255, 255, 255)
-        thickness = -1
-        cv2.rectangle(image, start_point, end_point, color, thickness)
-    cv2.imshow(window_name, image)
-    cv2.waitKey(3500)
-    pass
+def some_kwargs(picture_name, folder):
+    if picture_name is None and folder is None:
+        result = "Rectangles.jpg"
+    else:
+        result = '"' + folder + '/' + picture_name + '"'
+    return result
 
+def circleOfRectangles(width, distance, centerX, centerY, radius, angle, **save_picture):
+    image_width = centerX + radius
+    image_height = centerY + radius
+    clear_image = Image.new("RGB", (image_width, image_height), (0, 0, 0))
+    filename = "Rectangles.jpg"
+    clear_image.save(filename)
 
-# rectangles(5, 100, 500, 50, 290, 100)
-
-
-def circleOfRectangles(width, distance, centerX, centerY, radius, angle):
-    path = r'BlackRectangle.png'
+    path = r"Rectangles.jpg"
     image = cv2.imread(path)
     window_name = 'Image'
     quality = math.trunc((((2 * radius) + distance) / (width + distance)) + 2)
@@ -46,10 +42,13 @@ def circleOfRectangles(width, distance, centerX, centerY, radius, angle):
         (h, w) = image.shape[:2]
         rotation_matrix = cv2.getRotationMatrix2D((centerX, centerY), angle, 1)
         rotated = cv2.warpAffine(image, rotation_matrix, (w, h))
-        crop_image = rotated[centerY - radius - 10:centerY + radius + 10, centerX - radius - 10:centerX + radius + 10]
+        crop_image = rotated[centerY - radius:centerY + radius, centerX - radius:centerX + radius]
     cv2.imshow(window_name, crop_image)
+    print(some_kwargs(**save_picture))
+    cv2.imwrite(some_kwargs(**save_picture), crop_image)
     cv2.waitKey(3500)
     pass
 
 
-circleOfRectangles(10, 10, 630, 350, 200, 143)
+circleOfRectangles(10, 10, 500, 500, 200, 143, picture_name="PictureTest5.jpg", folder="Pictures")
+# circleOfRectangles(10, 10, 500, 500, 200, 143, picture_name=None, folder=None)
