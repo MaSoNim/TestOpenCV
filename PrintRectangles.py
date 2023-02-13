@@ -23,6 +23,13 @@ def return_path(input_kwargs):
 def circleOfRectangles(width, distance, radius, angle, size_w, size_h, **kwargs):
     r"""
     Args:
+        width: rectangle width (the parameter is set in millimeters)
+        distance: distance between rectangles (the parameter is set in millimeters)
+        radius: the radius of the circle to fit the rectangles into
+        angle: the angle of rotation of the pattern
+        size_w: image width (the parameter is set in millimeters)
+        size_h: image height (the parameter is set in millimeters)
+        **kwargs: link to save the image
         image_wigth, image_height: parameters describing the image size
         centerX, centerY: parameters describing the center of the image
         image: canvas for drawing
@@ -76,7 +83,7 @@ def circleOfRectangles(width, distance, radius, angle, size_w, size_h, **kwargs)
     cv2.imwrite(result_path, rotated)
     return image
 
-# starting the function (rectangle width, distance between rectangles, the radius of the circle to fit the rectangles into, the angle of rotation of the pattern, image width, image height, link to save the image)
+# starting the function
 # circleOfRectangles(100, 100, 1000, 0, 2048, 2048, picture_name='PictureTest5.jpg', folder='Pictures')
 # circleOfRectangles(10, 10, 200, 143, 400, 400, picture_name=None, folder=None)
 
@@ -85,6 +92,13 @@ def circleOfRectangles(width, distance, radius, angle, size_w, size_h, **kwargs)
 def vectorCircleOfRectangles(width, distance, radius, angle, size_w, size_h, **kwargs):
     r"""
     Args:
+        width: rectangle width (the parameter is set in millimeters)
+        distance: distance between rectangles (the parameter is set in millimeters)
+        radius: the radius of the circle to fit the rectangles into
+        angle: the angle of rotation of the pattern
+        size_w: image width (the parameter is set in millimeters)
+        size_h: image height (the parameter is set in millimeters)
+        **kwargs: link to save the image
         img: canvas for drawing
         centerX, centerY: parameters describing the center of the image
         quality: the number of rectangles that can be drawn on the image
@@ -135,6 +149,6 @@ def vectorCircleOfRectangles(width, distance, radius, angle, size_w, size_h, **k
     # saving an image in png format
     renderPM.drawToFile(svg2rlg(return_path(kwargs)), return_path(kwargs)[:-3] + 'png', fmt='PNG')
 
-# starting the function (rectangle width, distance between rectangles, the radius of the circle to fit the rectangles into, the angle of rotation of the pattern, image width, image height, link to save the image)
+# starting the function
 vectorCircleOfRectangles(100, 100, 1000, 143, 2048, 2048, picture_name='Test1.svg', folder='SVGandPNG')
 # vectorCircleOfRectangles(100, 100, 1000, 143, 2048, 2048, picture_name=None, folder=None)
