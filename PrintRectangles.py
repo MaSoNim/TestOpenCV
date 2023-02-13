@@ -1,54 +1,140 @@
 import cv2
 import math
-from PIL import Image
+import numpy as np
+import os
+import svgutils
+from svglib.svglib import svg2rlg
+from reportlab.graphics import renderPM
+import svgwrite
 
-def some_kwargs(picture_name, folder):
-    if picture_name is None and folder is None:
-        result = "Rectangles.jpg"
-    else:
-        result = '"' + folder + '/' + picture_name + '"'
-    return result
+# сreating a return path
+def return_path(input_kwargs):
+    picture_name = input_kwargs['picture_name']
+    folder = input_kwargs['folder']
+    if folder is None:
+        folder = os.path.abspath(os.getcwd())
+    if picture_name is None:
+        picture_name = "example.svg"
+    result_path = os.path.join(folder, picture_name)
+    return result_path
 
-def circleOfRectangles(width, distance, centerX, centerY, radius, angle, **save_picture):
-    image_width = centerX + radius
-    image_height = centerY + radius
-    clear_image = Image.new("RGB", (image_width, image_height), (0, 0, 0))
-    filename = "Rectangles.jpg"
-    clear_image.save(filename)
 
-    path = r"Rectangles.jpg"
-    image = cv2.imread(path)
-    window_name = 'Image'
+# creating a pattern in jpg format
+def circleOfRectangles(width, distance, radius, angle, size_w, size_h, **kwargs):
+    r"""
+    Args:
+        image_wigth, image_height: parameters describing the image size
+        centerX, centerY: parameters describing the center of the image
+        image: canvas for drawing
+        quality: the number of rectangles that can be drawn on the image
+        centralRectangle: defines the central rectangle
+        centerOffsetX: the center of the central rectangle
+        start_point, end_point: the starting and ending points of the rectangle
+        color, thickness: rectangle border color and thickness
+        rotation_matrix, rotated: variables for image rotation
+        result_path: link to save the image
+    """
+
+    # set image parameters and its center
+    image_width = size_w
+    image_height = size_h
+    centerX = size_w // 2
+    centerY = size_h // 2
+
+    # creating a canvas
+    image = np.zeros((image_width, image_height, 3), np.uint8)
+
+    # calculation of pattern elements
     quality = math.trunc((((2 * radius) + distance) / (width + distance)) + 2)
     centralRectangle = quality // 2
     for i in range(quality):
         centerOffsetX = centerX - ((centralRectangle - i) * (width + distance))
         if radius + centerX > centerOffsetX > centerX - radius:
             if centralRectangle > i:
-                start_point = (math.trunc(centerOffsetX - (width / 2)), math.trunc(centerY - ((centerY + radius * math.sin(
+                start_point = (
+                math.trunc(centerOffsetX - (width / 2)), math.trunc(centerY - ((centerY + radius * math.sin(
                     math.acos(
                         ((centerOffsetX - (width / 2)) - centerX) / radius))) - centerY)))
                 end_point = (math.trunc(centerOffsetX + (width / 2)), math.trunc(centerY + radius * math.sin(
                     math.acos(((centerOffsetX - (width / 2)) - centerX) / radius))))
             else:
-                start_point = (math.trunc(centerOffsetX - (width / 2)), math.trunc(centerY - ((centerY + radius * math.sin(
+                start_point = (
+                math.trunc(centerOffsetX - (width / 2)), math.trunc(centerY - ((centerY + radius * math.sin(
                     math.acos(
                         ((centerOffsetX + (width / 2)) - centerX) / radius))) - centerY)))
                 end_point = (math.trunc(centerOffsetX + (width / 2)), math.trunc(centerY + radius * math.sin(
                     math.acos(((centerOffsetX + (width / 2)) - centerX) / radius))))
             color = (255, 255, 255)
             thickness = -1
+            # draw a rectangle
             cv2.rectangle(image, start_point, end_point, color, thickness)
-        (h, w) = image.shape[:2]
+        # image rotation
         rotation_matrix = cv2.getRotationMatrix2D((centerX, centerY), angle, 1)
-        rotated = cv2.warpAffine(image, rotation_matrix, (w, h))
-        crop_image = rotated[centerY - radius:centerY + radius, centerX - radius:centerX + radius]
-    cv2.imshow(window_name, crop_image)
-    print(some_kwargs(**save_picture))
-    cv2.imwrite(some_kwargs(**save_picture), crop_image)
-    cv2.waitKey(3500)
-    pass
+        rotated = cv2.warpAffine(image, rotation_matrix, (image_width, image_height))
+    # saving an image
+    result_path = return_path(kwargs)
+    cv2.imwrite(result_path, rotated)
+    return image
+
+# starting the function (rectangle width, distance between rectangles, the radius of the circle to fit the rectangles into, the angle of rotation of the pattern, image width, image height, link to save the image)
+# circleOfRectangles(100, 100, 1000, 0, 2048, 2048, picture_name='PictureTest5.jpg', folder='Pictures')
+# circleOfRectangles(10, 10, 200, 143, 400, 400, picture_name=None, folder=None)
 
 
-circleOfRectangles(10, 10, 500, 500, 200, 143, picture_name="PictureTest5.jpg", folder="Pictures")
-# circleOfRectangles(10, 10, 500, 500, 200, 143, picture_name=None, folder=None)
+# creating a pattern in svg and png format
+def vectorCircleOfRectangles(width, distance, radius, angle, size_w, size_h, **kwargs):
+    r"""
+    Args:
+        img: canvas for drawing
+        centerX, centerY: parameters describing the center of the image
+        quality: the number of rectangles that can be drawn on the image
+        centralRectangle: defines the central rectangle
+        centerOffsetX: the center of the central rectangle
+        start_pointX, start_pointY, end_pointY: the starting and ending points of the rectangle
+        originalSVG: reading an svg image to rotate it
+        figure: making svg shapes
+    """
+
+    # creating a canvas
+    img = svgwrite.Drawing('example.svg', size=(f'{size_w}mm', f'{size_h}mm'),
+                           viewBox=f'{size_w / 2 * -1} {size_h / 2 * -1} {size_w} {size_h}')
+
+    # calculation of pattern elements
+    centerX = 0
+    centerY = 0
+    quality = math.trunc((((2 * radius) + distance) / (width + distance)) + 2)
+    centralRectangle = quality // 2
+    for i in range(quality):
+        centerOffsetX = centerX - ((centralRectangle - i) * (width + distance))
+        if radius + centerX > centerOffsetX > centerX - radius:
+            if centralRectangle > i:
+                start_pointX = math.trunc(centerOffsetX - (width / 2))
+                start_pointY = math.trunc(centerY - ((centerY + radius * math.sin(
+                    math.acos(((centerOffsetX - (width / 2)) - centerX) / radius))) - centerY))
+                end_pointY = math.trunc(
+                    centerY + radius * math.sin(math.acos(((centerOffsetX - (width / 2)) - centerX) / radius)))
+            else:
+                start_pointX = math.trunc(centerOffsetX - (width / 2))
+                start_pointY = math.trunc(centerY - ((centerY + radius * math.sin(
+                    math.acos(((centerOffsetX + (width / 2)) - centerX) / radius))) - centerY))
+                end_pointY = math.trunc(
+                    centerY + radius * math.sin(math.acos(((centerOffsetX + (width / 2)) - centerX) / radius)))
+            # draw a rectangle
+            img.add(img.rect(insert=(start_pointX, start_pointY), size=(width, (end_pointY - start_pointY)),
+                                 fill=svgwrite.rgb(255, 255, 255)))
+    # saving an image
+    img.save()
+    # image rotation
+    originalSVG = svgutils.compose.SVG('example.svg')
+    originalSVG.rotate(angle)
+    figure = svgutils.transform.fromstring(
+        (svgutils.compose.Figure(f'{size_w}mm', f'{size_h}mm', originalSVG)).tostr().decode('utf-8').replace(
+            'viewBox="0 0', f'viewBox="{size_w / 2 * -1} {size_h / 2 * -1}'))
+    # saving an image
+    figure.save(return_path(kwargs))
+    # saving an image in png format
+    renderPM.drawToFile(svg2rlg(return_path(kwargs)), return_path(kwargs)[:-3] + 'png', fmt='PNG')
+
+# starting the function (rectangle width, distance between rectangles, the radius of the circle to fit the rectangles into, the angle of rotation of the pattern, image width, image height, link to save the image)
+vectorCircleOfRectangles(100, 100, 1000, 143, 2048, 2048, picture_name='Test1.svg', folder='SVGandPNG')
+# vectorCircleOfRectangles(100, 100, 1000, 143, 2048, 2048, picture_name=None, folder=None)

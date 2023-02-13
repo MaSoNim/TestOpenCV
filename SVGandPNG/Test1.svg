@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='ASCII' standalone='yes'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="2048.0mm" viewBox="-1024.0 -1024.0 2048.0 2048.0" height="2048.0mm">
+  <g>
+    <g transform=" rotate(45.000000 0.000000 0.000000)">
+      <defs/>
+      <rect fill="rgb(255,255,255)" height="1052" width="100" x="-850" y="-526"/>
+      <rect fill="rgb(255,255,255)" height="1518" width="100" x="-650" y="-759"/>
+      <rect fill="rgb(255,255,255)" height="1786" width="100" x="-450" y="-893"/>
+      <rect fill="rgb(255,255,255)" height="1936" width="100" x="-250" y="-968"/>
+      <rect fill="rgb(255,255,255)" height="1996" width="100" x="-50" y="-998"/>
+      <rect fill="rgb(255,255,255)" height="1936" width="100" x="150" y="-968"/>
+      <rect fill="rgb(255,255,255)" height="1786" width="100" x="350" y="-893"/>
+      <rect fill="rgb(255,255,255)" height="1518" width="100" x="550" y="-759"/>
+      <rect fill="rgb(255,255,255)" height="1052" width="100" x="750" y="-526"/>
+    </g>
+  </g>
+</svg>
