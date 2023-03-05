@@ -4,6 +4,7 @@ import numpy as np
 import os
 import svgutils
 from svglib.svglib import svg2rlg
+from PIL import Image
 from reportlab.graphics import renderPM
 import svgwrite
 
@@ -147,7 +148,8 @@ def vectorCircleOfRectangles(width, distance, radius, angle, size_w, size_h, **k
     # saving an image
     figure.save(return_path(kwargs))
     # saving an image in png format
-    renderPM.drawToFile(svg2rlg(return_path(kwargs)), return_path(kwargs)[:-3] + 'png', fmt='PNG')
+    renderPM.drawToFile(svg2rlg(return_path(kwargs)), return_path(kwargs)[:-3] + 'png', fmt='PNG', bg=0)
+
 
 # starting the function
 vectorCircleOfRectangles(100, 100, 1000, 143, 2048, 2048, picture_name='Test1.svg', folder='SVGandPNG')
